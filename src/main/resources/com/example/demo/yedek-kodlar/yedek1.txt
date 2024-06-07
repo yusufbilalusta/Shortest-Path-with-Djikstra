@@ -1,0 +1,359 @@
+package com.example.demo;
+
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.control.Label;
+import javafx.scene.control.ToolBar;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Line;
+
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.ResourceBundle;
+import com.example.demo.Yollar;
+
+
+public class HelloController {
+
+    @FXML
+    private BorderPane borderpane;
+
+    @FXML
+    private Button button_home;
+
+    @FXML
+    private Button button_mosque;
+
+    @FXML
+    private Button button_path;
+
+    @FXML
+    private Button button_restaurant;
+
+    @FXML
+    private Button button_rote;
+
+    @FXML
+    private Button button_school;
+
+    @FXML
+    private Button button_wc;
+
+    @FXML
+    private ImageView image_home;
+
+    @FXML
+    private ImageView image_mosque;
+
+    @FXML
+    private ImageView image_restaurant;
+
+    @FXML
+    private ImageView image_school;
+
+    @FXML
+    private ImageView image_wc;
+
+    @FXML
+    private VBox sol_vbox;
+
+    @FXML
+    private AnchorPane sol_vbox_anchor;
+
+    @FXML
+    private ToolBar toolbar;
+    @FXML
+    private ImageView image_mosque1;
+    @FXML
+    private ImageView image_restaurant1;
+    @FXML
+    private ImageView image_school1;
+    @FXML
+    private ImageView image_wc1;
+
+    @FXML
+    private Button button_barrier;
+
+    @FXML
+    private Button button_barrier2;
+    @FXML
+    private ImageView image_barrier;
+
+    @FXML
+    private ImageView image_barrier2;
+    @FXML
+    private ImageView image_home1;
+    @FXML
+    private ImageView image_barrier21;
+
+    @FXML
+    private ImageView image_barrier1;
+    private double xOffset, yOffset;
+
+    void OnMousePressed(Node node){
+        node.setOnMousePressed(event -> {
+            // Fare konumunu al
+            xOffset = event.getSceneX() - node.getLayoutX();
+            yOffset = event.getSceneY() - node.getLayoutY();
+        });
+    }
+
+    void OnMouseDragged(Node node){
+        // Fare sürüklendiğinde (MouseDragged)
+        node.setOnMouseDragged(event -> {
+            // Yeni konumu belirle
+            node.setLayoutX(event.getSceneX() - xOffset);
+            node.setLayoutY(event.getSceneY() - yOffset);
+        });
+    }
+
+    void OnMouseRelaeased(Node node){
+
+    }
+
+
+
+    @FXML
+    void VisibleHome(ActionEvent event) {
+        image_home1.setVisible(true);
+        OnMouseDragged(image_home1);
+        OnMousePressed(image_home1);
+        OnMouseRelaeased(image_home1);
+    }
+    @FXML
+    void VisibleMosque(ActionEvent event) {
+        image_mosque1.setVisible(true);
+        OnMouseDragged(image_mosque1);
+        OnMousePressed(image_mosque1);
+        OnMouseRelaeased(image_mosque1);
+    }
+    @FXML
+    void VisibleRestaurant(ActionEvent event) {
+        image_restaurant1.setVisible(true);
+        OnMouseDragged(image_restaurant1);
+        OnMousePressed(image_restaurant1);
+        OnMouseRelaeased(image_restaurant1);
+    }
+    @FXML
+    void VisibleSchool(ActionEvent event) {
+        image_school1.setVisible(true);
+        OnMouseDragged(image_school1);
+        OnMousePressed(image_school1);
+        OnMouseRelaeased(image_school1);
+    }
+    @FXML
+    void VisibleBarrier(ActionEvent event) {
+        image_barrier1.setVisible(true);
+        OnMouseDragged(image_barrier1);
+        OnMousePressed(image_barrier1);
+        OnMouseRelaeased(image_barrier1);
+    }
+    @FXML
+    void VisibleBarrier2(ActionEvent event) {
+        image_barrier21.setVisible(true);
+        OnMouseDragged(image_barrier21);
+        OnMousePressed(image_barrier21);
+        OnMouseRelaeased(image_barrier21);
+    }
+    @FXML
+    void VisibleWc(ActionEvent event) {
+        image_wc1.setVisible(true);
+        OnMouseDragged(image_wc1);
+        OnMousePressed(image_wc1);
+        OnMouseRelaeased(image_wc1);
+    }
+    @FXML
+    void drawLineButtonClicked(ActionEvent event) {
+        ChoiceDialog<String> dialog = new ChoiceDialog<>("image_home1", "image_mosque1", "image_restaurant1", "image_school1", "image_wc1","image_barrier1","image_barrier21");
+        dialog.setTitle("Node Seçimi");
+        dialog.setHeaderText("İki node arasında bir çizgi çizmek için node'lar arasında seçim yapın");
+        dialog.setContentText("İlk node'yi seçin:");
+        Optional<String> result1 = dialog.showAndWait();
+
+        if (result1.isPresent()) {
+            String selectedNode1 = result1.get();
+            dialog.setHeaderText("İkinci node'yi seçin:");
+            dialog.setContentText("İkinci node'yi seçin:");
+            Optional<String> result2 = dialog.showAndWait();
+
+            if (result2.isPresent()) {
+                String selectedNode2 = result2.get();
+
+                drawLineBetweenNodes(selectedNode1, selectedNode2);
+            }
+        }
+    }
+
+    private void drawLineBetweenNodes(String nodeName1, String nodeName2) {
+        ImageView node1 = getNodeByName(nodeName1);
+        ImageView node2 = getNodeByName(nodeName2);
+
+        if (node1 != null && node2 != null) {
+            Line line = new Line();
+            line.startXProperty().bind(node1.layoutXProperty().add(node1.boundsInLocalProperty().getValue().getWidth() / 2));
+            line.startYProperty().bind(node1.layoutYProperty().add(node1.boundsInLocalProperty().getValue().getHeight() / 2));
+            line.endXProperty().bind(node2.layoutXProperty().add(node2.boundsInLocalProperty().getValue().getWidth() / 2));
+            line.endYProperty().bind(node2.layoutYProperty().add(node2.boundsInLocalProperty().getValue().getHeight() / 2));
+            sol_vbox_anchor.getChildren().add(line);
+/*
+            // İndisleri al ve mesafeyi komşuluk matrisine ekle
+            int index1 = nodeIndexMap.get(node1);
+            int index2 = nodeIndexMap.get(node2);
+            int distance = calculateDistance(node1, node2);
+
+            graph[index1][index2] = distance;
+            graph[index2][index1] = distance; // Eğer yönsüz graf ise*/
+        }
+    }
+
+    private int calculateDistance(ImageView node1, ImageView node2) {
+        // İki nokta arasındaki mesafeyi hesapla (örneğin, doğrudan uzaklık)
+        // Bu örnekte basitçe iki nokta arasındaki doğrudan mesafeyi döndürüyorum
+        return (int) Math.sqrt(Math.pow(node2.getLayoutX() - node1.getLayoutX(), 2) +
+                Math.pow(node2.getLayoutY() - node1.getLayoutY(), 2));
+    }
+
+
+    private ImageView getNodeByName(String nodeName) {
+        switch (nodeName) {
+            case "image_home1":
+                return image_home1;
+            case "image_mosque1":
+                return image_mosque1;
+            case "image_restaurant1":
+                return image_restaurant1;
+            case "image_school1":
+                return image_school1;
+            case "image_wc1":
+                return image_wc1;
+            case "image_barrier1":
+                return image_barrier1;
+            case "image_barrier21":
+                return image_barrier21;
+            default:
+                return null;
+        }
+    }
+
+    private Map<ImageView, Integer> nodeIndexMap = new HashMap<>();
+    private int[][] graph;
+    private int nodeCount = 7; // Bu, toplam node sayınız. Örneğin, 7 düğüm varsa.
+
+    @FXML
+    public void initialize() {
+        // Her bir ImageView'e bir indeks atıyoruz
+        nodeIndexMap.put(image_home1, 0);
+        nodeIndexMap.put(image_mosque1, 1);
+        nodeIndexMap.put(image_restaurant1, 2);
+        nodeIndexMap.put(image_school1, 3);
+        nodeIndexMap.put(image_wc1, 4);
+        nodeIndexMap.put(image_barrier1, 5);
+        nodeIndexMap.put(image_barrier21, 6);
+
+        // Komşuluk matrisi oluştur
+        graph = new int[nodeCount][nodeCount];
+
+        // Matrisin tüm elemanlarını başlangıçta sonsuz (veya büyük bir değer) olarak ayarlayın
+        for (int i = 0; i < nodeCount; i++) {
+            for (int j = 0; j < nodeCount; j++) {
+                if (i != j) {
+                    graph[i][j] = Integer.MAX_VALUE;
+                } else {
+                    graph[i][j] = 0;
+                }
+            }
+        }
+    }
+
+    public void dijkstra(int src) {
+        int[] dist = new int[nodeCount]; // En kısa mesafeleri tutacak dizi
+        int[] predecessor = new int[nodeCount]; // Öncül düğümleri tutacak dizi
+        Boolean[] sptSet = new Boolean[nodeCount]; // İşlenmiş düğümleri tutacak dizi
+
+        // Tüm mesafeleri sonsuz ve işlenmemiş olarak ayarla
+        for (int i = 0; i < nodeCount; i++) {
+            dist[i] = Integer.MAX_VALUE;
+            sptSet[i] = false;
+        }
+
+        // Kaynak düğümden kendisine olan mesafe 0'dır
+        dist[src] = 0;
+        predecessor[src] = -1; // Kaynak düğümün öncülü yok
+
+        // Tüm düğümler için en kısa yolu bul
+        for (int count = 0; count < nodeCount - 1; count++) {
+            int u = minDistance(dist, sptSet);
+
+            // Seçilen düğümü işlenmiş olarak işaretle
+            sptSet[u] = true;
+
+            // Seçilen düğümün komşularının mesafelerini güncelle
+            for (int v = 0; v < nodeCount; v++) {
+                if (!sptSet[v] && graph[u][v] != 0 && dist[u] != Integer.MAX_VALUE && dist[u] + graph[u][v] < dist[v]) {
+                    dist[v] = dist[u] + graph[u][v];
+                    predecessor[v] = u; // Öncülü güncelle
+                }
+            }
+        }
+
+        // Sonuçları yazdır
+        for (int i=0; i<7;i++){
+            for (int j=0;j<7; j++){
+                System.out.println(graph[i][j]);
+            }
+        }
+        //printSolution(src, dist, predecessor);
+    }
+
+    int minDistance(int[] dist, Boolean[] sptSet) {
+        int min = Integer.MAX_VALUE, min_index = -1;
+
+        for (int v = 0; v < nodeCount; v++) {
+            if (!sptSet[v] && dist[v] <= min) {
+                min = dist[v];
+                min_index = v;
+            }
+        }
+
+        return min_index;
+    }
+
+    void printSolution(int src, int[] dist, int[] predecessor) {
+        System.out.println("Düğüm \t\t Mesafe \t\t En Kısa Yol");
+        for (int i = 0; i < nodeCount; i++) {
+            System.out.print(i + " \t\t " + dist[i] + "\t\t\t");
+            printPath(src, i, predecessor);
+            System.out.println();
+        }
+    }
+
+    void printPath(int src, int dest, int[] predecessor) {
+        if (dest == src) {
+            System.out.print(src);
+            return;
+        }
+        printPath(src, predecessor[dest], predecessor);
+        System.out.print(" -> " + dest);
+    }
+
+    @FXML
+    void calculateShortestPath(ActionEvent event) {
+        // Örneğin, 0 indeksli düğümden (image_home1) en kısa yolları hesaplayın
+        dijkstra(0);
+    }
+
+
+}

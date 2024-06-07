@@ -1,0 +1,27 @@
+.sol_vbox_anchor {
+    -fx-background-color: #353A56;
+    -fx-border-width: 2px;
+    -fx-border-radius: 0px;
+    -fx-background-radius: 0px;
+    -fx-border-style: solid;
+}
+
+.inner_pane {
+    -fx-background-color: #748CF1;
+    -fx-border-width: 2px;
+    -fx-border-radius: 0px;
+    -fx-background-radius: 0px;
+    -fx-border-style: solid;
+}
+
+.buton {
+    -fx-background-color: #748CF1;
+}
+
+.sol_vbox {
+    -fx-background-color: #A4BFFF;
+    -fx-border-width: 2px;
+    -fx-border-radius: 0px;
+    -fx-background-radius: 0px;
+    -fx-border-style: solid;
+}

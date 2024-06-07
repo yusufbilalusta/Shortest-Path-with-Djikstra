@@ -1,0 +1,6 @@
+- Arraylist yerine linkedlist kullanılacak
+- Bütün node lar indis verilmiş olucak bu sayede dijkstra algoritmasına uyucak.
+- DFS yada BFS ile gezinme olucak ve bunu yaparken stack de kullanılmış olucak
+- Şu an graph yapısı algoritmadan dolayı array olarak temsil ediliyor onu Node lu yapıya
+  çevrilebilirmi bakmak lazım
+- TOTAL olarak linkedlist, stack, graph(yani ağacı da kapsıyor) ve gezinme türleri kullanılmış olucak

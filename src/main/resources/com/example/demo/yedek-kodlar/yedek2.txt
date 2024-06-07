@@ -1,0 +1,274 @@
+package com.example.demo;
+//Bu kod mevcut hali ile çalışmakta
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceDialog;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.shape.Line;
+
+import java.util.*;
+
+public class HelloController {
+
+    @FXML
+    private BorderPane borderpane;
+
+    @FXML
+    private Button button_home;
+
+    @FXML
+    private Button button_mosque;
+
+    @FXML
+    private Button button_path;
+
+    @FXML
+    private Button button_restaurant;
+
+    @FXML
+    private Button button_rote;
+
+    @FXML
+    private Button button_school;
+
+    @FXML
+    private Button button_wc;
+
+    @FXML
+    private ImageView image_home;
+
+    @FXML
+    private ImageView image_mosque;
+
+    @FXML
+    private ImageView image_restaurant;
+
+    @FXML
+    private ImageView image_school;
+
+    @FXML
+    private ImageView image_wc;
+
+    @FXML
+    private VBox sol_vbox;
+
+    @FXML
+    private AnchorPane sol_vbox_anchor;
+
+    private Map<ImageView, Map<ImageView, Integer>> graph = new HashMap<>();
+    private Map<String, ImageView> nodeNameMap = new HashMap<>();
+    private double xOffset, yOffset;
+
+    @FXML
+    void initialize() {
+        nodeNameMap.put("image_home1", image_home1);
+        nodeNameMap.put("image_mosque1", image_mosque1);
+        nodeNameMap.put("image_restaurant1", image_restaurant1);
+        nodeNameMap.put("image_school1", image_school1);
+        nodeNameMap.put("image_wc1", image_wc1);
+        nodeNameMap.put("image_barrier1", image_barrier1);
+        nodeNameMap.put("image_barrier21", image_barrier21);
+
+        for (ImageView node : nodeNameMap.values()) {
+            OnMouseDragged(node);
+            OnMousePressed(node);
+        }
+    }
+
+    void OnMousePressed(Node node) {
+        node.setOnMousePressed(event -> {
+            xOffset = event.getSceneX() - node.getLayoutX();
+            yOffset = event.getSceneY() - node.getLayoutY();
+        });
+    }
+
+    void OnMouseDragged(Node node) {
+        node.setOnMouseDragged(event -> {
+            node.setLayoutX(event.getSceneX() - xOffset);
+            node.setLayoutY(event.getSceneY() - yOffset);
+        });
+    }
+
+    @FXML
+    void VisibleHome(ActionEvent event) {
+        image_home1.setVisible(true);
+    }
+
+    @FXML
+    void VisibleMosque(ActionEvent event) {
+        image_mosque1.setVisible(true);
+    }
+
+    @FXML
+    void VisibleRestaurant(ActionEvent event) {
+        image_restaurant1.setVisible(true);
+    }
+
+    @FXML
+    void VisibleSchool(ActionEvent event) {
+        image_school1.setVisible(true);
+    }
+
+    @FXML
+    void VisibleBarrier(ActionEvent event) {
+        image_barrier1.setVisible(true);
+    }
+
+    @FXML
+    void VisibleBarrier2(ActionEvent event) {
+        image_barrier21.setVisible(true);
+    }
+
+    @FXML
+    void VisibleWc(ActionEvent event) {
+        image_wc1.setVisible(true);
+    }
+
+    @FXML
+    void drawLineButtonClicked(ActionEvent event) {
+        ChoiceDialog<String> dialog = new ChoiceDialog<>("image_home1", "image_mosque1", "image_restaurant1", "image_school1", "image_wc1", "image_barrier1", "image_barrier21");
+        dialog.setTitle("Node Seçimi");
+        dialog.setHeaderText("İki node arasında bir çizgi çizmek için node'lar arasında seçim yapın");
+        dialog.setContentText("İlk node'yi seçin:");
+        Optional<String> result1 = dialog.showAndWait();
+
+        if (result1.isPresent()) {
+            String selectedNode1 = result1.get();
+            dialog.setHeaderText("İkinci node'yi seçin:");
+            dialog.setContentText("İkinci node'yi seçin:");
+            Optional<String> result2 = dialog.showAndWait();
+
+            if (result2.isPresent()) {
+                String selectedNode2 = result2.get();
+                drawLineBetweenNodes(selectedNode1, selectedNode2);
+            }
+        }
+    }
+
+    private void drawLineBetweenNodes(String nodeName1, String nodeName2) {
+        ImageView node1 = nodeNameMap.get(nodeName1);
+        ImageView node2 = nodeNameMap.get(nodeName2);
+
+        if (node1 != null && node2 != null) {
+            Line line = new Line();
+            line.startXProperty().bind(node1.layoutXProperty().add(node1.boundsInLocalProperty().getValue().getWidth() / 2));
+            line.startYProperty().bind(node1.layoutYProperty().add(node1.boundsInLocalProperty().getValue().getHeight() / 2));
+            line.endXProperty().bind(node2.layoutXProperty().add(node2.boundsInLocalProperty().getValue().getWidth() / 2));
+            line.endYProperty().bind(node2.layoutYProperty().add(node2.boundsInLocalProperty().getValue().getHeight() / 2));
+            sol_vbox_anchor.getChildren().add(line);
+            //layoutXProperty -> nodeun sol ust kosesinin X konumu
+            //add fonksiyonu burda ekleme yapıyor (toplama) yani iki şeyi birleştirmiyor
+            int distance = calculateDistance(node1, node2);
+            addEdge(node1, node2, distance);
+        }
+    }
+
+    private int calculateDistance(ImageView node1, ImageView node2) {
+        double dx = node1.getLayoutX() - node2.getLayoutX();
+        double dy = node1.getLayoutY() - node2.getLayoutY();
+        return (int) Math.sqrt(dx * dx + dy * dy);
+    }
+
+    private void addEdge(ImageView node1, ImageView node2, int distance) {
+        graph.computeIfAbsent(node1, k -> new HashMap<>()).put(node2, distance);
+        graph.computeIfAbsent(node2, k -> new HashMap<>()).put(node1, distance); // For undirected graph
+    }
+
+    @FXML
+    void findShortestPath(ActionEvent event) {
+        ImageView startNode = image_home1;
+        ImageView endNode = image_restaurant1;
+
+        List<ImageView> shortestPath = dijkstra(startNode, endNode);
+
+        if (shortestPath != null) {
+            highlightPath(shortestPath);
+        }
+    }
+
+    private List<ImageView> dijkstra(ImageView start, ImageView end) {
+        Map<ImageView, Integer> distances = new HashMap<>();
+        Map<ImageView, ImageView> previousNodes = new HashMap<>();
+        PriorityQueue<ImageView> priorityQueue = new PriorityQueue<>(Comparator.comparingInt(distances::get));
+
+        for (ImageView node : graph.keySet()) {
+            if (node == start) {
+                distances.put(node, 0);
+            } else {
+                distances.put(node, Integer.MAX_VALUE);
+            }
+            priorityQueue.add(node);
+        }
+
+        while (!priorityQueue.isEmpty()) {
+            ImageView currentNode = priorityQueue.poll();
+            if (currentNode == end) {
+                break;
+            }
+
+            Map<ImageView, Integer> neighbors = graph.get(currentNode);
+            if (neighbors != null) {
+                for (Map.Entry<ImageView, Integer> neighborEntry : neighbors.entrySet()) {
+                    ImageView neighbor = neighborEntry.getKey();
+                    int distance = neighborEntry.getValue();
+
+                    int newDist = distances.get(currentNode) + distance;
+                    if (newDist < distances.get(neighbor)) {
+                        priorityQueue.remove(neighbor);
+                        distances.put(neighbor, newDist);
+                        previousNodes.put(neighbor, currentNode);
+                        priorityQueue.add(neighbor);
+                    }
+                }
+            }
+        }
+
+        List<ImageView> path = new ArrayList<>();
+        for (ImageView at = end; at != null; at = previousNodes.get(at)) {
+            path.add(at);
+        }
+        Collections.reverse(path);
+
+        return path.get(0) == start ? path : null;
+    }
+
+    private void highlightPath(List<ImageView> path) {
+        for (ImageView node : path) {
+            node.setStyle("-fx-effect: dropshadow(gaussian, red, 10, 0.5, 0, 0)");
+        }
+
+        for (int i = 0; i < path.size() - 1; i++) {
+            ImageView node1 = path.get(i);
+            ImageView node2 = path.get(i + 1);
+            Line line = new Line();
+            line.setStartX(node1.getLayoutX() + node1.getBoundsInLocal().getWidth() / 2);
+            line.setStartY(node1.getLayoutY() + node1.getBoundsInLocal().getHeight() / 2);
+            line.setEndX(node2.getLayoutX() + node2.getBoundsInLocal().getWidth() / 2);
+            line.setEndY(node2.getLayoutY() + node2.getBoundsInLocal().getHeight() / 2);
+            line.setStyle("-fx-stroke: red; -fx-stroke-width: 2;");
+            sol_vbox_anchor.getChildren().add(line);
+
+        }
+    }
+
+    // Add the FXML elements for the new nodes
+    @FXML
+    private ImageView image_home1;
+    @FXML
+    private ImageView image_mosque1;
+    @FXML
+    private ImageView image_restaurant1;
+    @FXML
+    private ImageView image_school1;
+    @FXML
+    private ImageView image_wc1;
+    @FXML
+    private ImageView image_barrier1;
+    @FXML
+    private ImageView image_barrier21;
+}
